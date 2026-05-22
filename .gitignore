@@ -13,6 +13,11 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+.ruff_cache/
+.tmp_wheel/
+build/
+dist/
+*.egg-info/
 
 # Editors
 .vscode/

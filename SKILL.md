@@ -17,7 +17,7 @@ description: >
 
 Fast local lookup of YANG paths and platform support for Nokia SR OS and SR Linux,
 backed by a pre-built SQLite database with FTS5 full-text index. Covers the **latest
-release of each product only**: SR OS 26.3.R1 (~126k paths) and SR Linux 25.10.2 (~17k paths).
+release of each product only**: SR OS 26.3.R2 (~126k paths) and SR Linux 26.3.1 (~17k paths).
 
 ## What this skill is good for
 
@@ -35,8 +35,8 @@ Answering questions like:
 - Source data: `paths.jsonl.gz` files from `https://yangbrowser.nokia.com`.
 - Pre-built SQLite databases are shipped in `data/` as xz-compressed blobs
   (to keep the skill zip under the claude.ai 30 MB uncompressed upload limit):
-  - `data/sros_26.3.R1.db.xz`    (~5 MB compressed → ~65 MB DB)
-  - `data/srlinux_25.10.2.db.xz` (~1 MB compressed → ~12 MB DB)
+  - `data/sros_26.3.R2.db.xz`    (~5 MB compressed → ~71 MB DB)
+  - `data/srlinux_26.3.1.db.xz`  (~1 MB compressed → ~13 MB DB)
 
   On first use the script decompresses the relevant DB into
   `/tmp/yang_browser_cache/` (or `$YANG_CACHE_DIR` if set). This is a one-time

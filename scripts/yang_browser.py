@@ -36,6 +36,18 @@ import urllib.request
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = SCRIPT_DIR.parent
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
+
+from nokia_yang_mcp.database import db_path_for as runtime_db_path_for
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except AttributeError:
+    pass
+
 DATA_DIR = SCRIPT_DIR.parent / "data"
 CACHE_DIR = Path(os.environ.get("YANG_CACHE_DIR", "/tmp/yang_browser_cache"))
 BASE_URL = "https://yangbrowser.nokia.com/releases"
@@ -230,32 +242,7 @@ def db_path_for(product_dir: str) -> Path:
     The compressed form drops the total DB payload from ~80 MB to ~3 MB, which
     keeps the skill's zip well under the 30 MB uncompressed upload limit.
     """
-    info = RELEASES[product_dir]
-    stem = f"{product_dir}_{info['release']}"
-    cached = CACHE_DIR / f"{stem}.db"
-    if cached.exists():
-        return cached
-
-    # Try to decompress the shipped .db.xz
-    import lzma
-    shipped_xz = DATA_DIR / f"{stem}.db.xz"
-    if shipped_xz.exists():
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        print(f"Decompressing {shipped_xz.name} -> {cached} (one-time) ...", file=sys.stderr)
-        tmp = cached.with_suffix(".db.partial")
-        with lzma.open(shipped_xz, "rb") as src, open(tmp, "wb") as dst:
-            while chunk := src.read(1 << 20):
-                dst.write(chunk)
-        tmp.replace(cached)  # atomic
-        return cached
-
-    # Fall back to the uncompressed .db if someone placed it in data/ directly
-    shipped_db = DATA_DIR / f"{stem}.db"
-    if shipped_db.exists():
-        return shipped_db
-
-    # Nothing shipped yet — caller will trigger build_db() from the JSONL source.
-    return cached
+    return runtime_db_path_for(product_dir, data_dir=DATA_DIR, cache_dir=CACHE_DIR)
 
 
 def open_db(product_dir: str) -> sqlite3.Connection:
@@ -1184,7 +1171,8 @@ Examples:
 
     if args.update:
         # Always update both products (user preference: keep them in sync).
-        return cmd_update(products=None, dry_run=args.dry_run, skip_probe=args.skip_probe)
+        products = [args.product] if "--product" in sys.argv else None
+        return cmd_update(products=products, dry_run=args.dry_run, skip_probe=args.skip_probe)
 
     if args.pack_skill:
         return cmd_pack_skill()
