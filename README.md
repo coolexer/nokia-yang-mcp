@@ -5,7 +5,9 @@ SR Linux, exposed as a Python MCP server for Claude Code, Codex, or any other
 MCP client.
 
 Backed by pre-built SQLite databases with FTS5 indexes. The bundled databases
-currently cover **SR OS 26.3.R2** and **SR Linux 26.3.1**.
+currently cover **SR OS 26.7.R1** and **SR Linux 26.7.1**.
+The databases are extracted to the system temporary directory on first use;
+set `YANG_CACHE_DIR` to use a persistent cache location.
 
 ## What It Does
 
@@ -77,6 +79,10 @@ Available MCP tools:
 - `yang_feature_support_matrix`
 - `yang_cross_product_feature_support`
 - `yang_suggest_gnmi_candidates`
+
+`yang_check_path_support` distinguishes an unknown path (`path-unknown`) from
+an unknown platform name (`platform-unknown`). Use `yang_list_platforms` to
+select a recognized platform before interpreting support results.
 
 ## Pairing With A gNMI MCP
 

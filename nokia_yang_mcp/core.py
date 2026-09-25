@@ -151,7 +151,7 @@ def check_path_support(product: str, path: str, platform: str) -> SupportResult:
 
         want_bits, want_names = platform_bitmask(conn, platform)
         if want_bits == 0:
-            return SupportResult("path-unknown", path, canonical, [], [])
+            return SupportResult("platform-unknown", path, canonical, [], [])
 
         have_bits = row["platform_bits"]
         if have_bits == 0:

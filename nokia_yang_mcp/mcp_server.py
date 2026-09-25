@@ -108,8 +108,8 @@ def yang_check_path_support(product: str, path: str, platform: str) -> dict[str,
 
     Returns status, original path, canonical path, supported platforms, and
     unsupported platforms. Status is one of `fully-supported`,
-    `partially-supported`, `not-supported`, `platform-agnostic`, or
-    `path-unknown`.
+    `partially-supported`, `not-supported`, `platform-agnostic`,
+    `platform-unknown`, or `path-unknown`.
     """
     validate_product(product)
     return check_path_support(product, path, platform).to_dict()
@@ -195,7 +195,7 @@ def yang_suggest_gnmi_candidates(
     if kind not in ("config", "state"):
         raise ValueError("kind must be 'config' or 'state'")
     limit = _clean_limit(limit, default=20)
-    resolved = resolve_feature(product, feature_or_query, limit=limit)
+    resolved = resolve_feature(product, feature_or_query, limit=limit) if kind == "config" else []
     if resolved:
         candidates = resolved
         source = "feature"

@@ -9,7 +9,7 @@ description: >
   a feature × platform matrix for Statement-of-Compliance documents. Also trigger
   on "yang browser", "yang model", "platform support", "feature check" in a Nokia
   networking context. Covers the latest SR OS and SR Linux releases only
-  (currently SR OS 26.3.R2 and SR Linux 26.3.1). To refresh data when newer
+  (currently SR OS 26.7.R1 and SR Linux 26.7.1). To refresh data when newer
   releases ship, run `python3 scripts/yang_browser.py --release`.
 ---
 
@@ -17,7 +17,7 @@ description: >
 
 Fast local lookup of YANG paths and platform support for Nokia SR OS and SR Linux,
 backed by a pre-built SQLite database with FTS5 full-text index. Covers the **latest
-release of each product only**: SR OS 26.3.R2 (~126k paths) and SR Linux 26.3.1 (~17k paths).
+release of each product only**: SR OS 26.7.R1 (~134k paths) and SR Linux 26.7.1 (~19k paths).
 
 ## What this skill is good for
 
@@ -35,12 +35,12 @@ Answering questions like:
 - Source data: `paths.jsonl.gz` files from `https://yangbrowser.nokia.com`.
 - Pre-built SQLite databases are shipped in `data/` as xz-compressed blobs
   (to keep the skill zip under the claude.ai 30 MB uncompressed upload limit):
-  - `data/sros_26.3.R2.db.xz`    (~5 MB compressed → ~71 MB DB)
-  - `data/srlinux_26.3.1.db.xz`  (~1 MB compressed → ~13 MB DB)
+  - `data/sros_26.7.R1.db.xz`    (~5.7 MB compressed → ~86 MB DB)
+  - `data/srlinux_26.7.1.db.xz`  (~1.3 MB compressed → ~16 MB DB)
 
   On first use the script decompresses the relevant DB into
-  `/tmp/yang_browser_cache/` (or `$YANG_CACHE_DIR` if set). This is a one-time
-  cost of ~300–900 ms per product; subsequent runs open the cached DB directly.
+  the system temporary directory (or `$YANG_CACHE_DIR` if set). Subsequent
+  runs open the cached DB directly.
 - The databases use:
   - An FTS5 full-text index over `path`, `path_prefix`, and `description`, with
     custom tokenchars `-_` so that `bgp-evpn` and `segment-routing-v6` are single
@@ -257,4 +257,4 @@ summary.
 
 All data is pulled from `https://yangbrowser.nokia.com/releases/{sros|srlinux}/{release}/paths.jsonl.gz`
 (see `--stats` for the exact URL used per DB). Raw downloads are cached in
-`/tmp/yang_browser_cache/` between rebuilds.
+the system temporary directory (or `$YANG_CACHE_DIR`) between rebuilds.

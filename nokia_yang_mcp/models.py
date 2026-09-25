@@ -13,6 +13,7 @@ SupportStatus = Literal[
     "not-supported",
     "platform-agnostic",
     "path-unknown",
+    "platform-unknown",
 ]
 
 

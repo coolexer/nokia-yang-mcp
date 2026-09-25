@@ -9,7 +9,7 @@ def test_cli_stats_command_outputs_release_metadata():
     result = CliRunner().invoke(main, ["stats", "--product", "sros"])
 
     assert result.exit_code == 0
-    assert "26.3.R2" in result.output
+    assert "26.7.R1" in result.output
 
 
 def test_cli_platforms_command_lists_known_platform():

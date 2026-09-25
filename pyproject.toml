@@ -11,10 +11,10 @@ requires-python = ">=3.11"
 authors = [
   {name = "coolexer"}
 ]
-license = {file = "LICENSE"}
+license = "MIT"
 dependencies = [
   "click>=8.1",
-  "fastmcp>=2.0"
+  "fastmcp>=4,<5"
 ]
 
 [project.optional-dependencies]
@@ -28,7 +28,7 @@ nokia-yang = "nokia_yang_mcp.cli:main"
 nokia-yang-mcp = "nokia_yang_mcp.mcp_server:main"
 
 [tool.setuptools]
-packages = ["nokia_yang_mcp"]
+packages = ["nokia_yang_mcp", "nokia_yang_mcp.data"]
 include-package-data = true
 
 [tool.setuptools.package-data]

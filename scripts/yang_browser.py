@@ -30,8 +30,10 @@ import argparse
 import gzip
 import json
 import os
+import shutil
 import sqlite3
 import sys
+import tempfile
 import urllib.request
 from pathlib import Path
 
@@ -49,14 +51,26 @@ except AttributeError:
     pass
 
 DATA_DIR = SCRIPT_DIR.parent / "data"
-CACHE_DIR = Path(os.environ.get("YANG_CACHE_DIR", "/tmp/yang_browser_cache"))
+PACKAGE_DATA_DIR = PROJECT_DIR / "nokia_yang_mcp" / "data"
+CACHE_DIR = Path(os.environ.get("YANG_CACHE_DIR", Path(tempfile.gettempdir()) / "yang_browser_cache"))
 BASE_URL = "https://yangbrowser.nokia.com/releases"
 
 # Only the latest releases are supported by this skill.
 RELEASES = {
-    "sros":   {"release": "26.3.R2", "product": "SR OS"},
-    "srlinux": {"release": "26.3.1", "product": "SR Linux"},
+    "sros":   {"release": "26.7.R1", "product": "SR OS"},
+    "srlinux": {"release": "26.7.1", "product": "SR Linux"},
 }
+
+
+def sync_package_db(product_dir: str, source: Path) -> None:
+    """Keep the installable MCP package in sync with the skill's data directory."""
+    if not PACKAGE_DATA_DIR.is_dir():
+        return  # Claude skill zip has no Python package.
+    target = PACKAGE_DATA_DIR / source.name
+    shutil.copy2(source, target)
+    for old in PACKAGE_DATA_DIR.glob(f"{product_dir}_*.db.xz"):
+        if old != target:
+            old.unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -926,6 +940,7 @@ def cmd_update(products: list[str] | None = None, dry_run: bool = False,
                     if old != out_xz:
                         print(f"Removing obsolete {old.name}", file=sys.stderr)
                         old.unlink()
+                sync_package_db(pdir, out_xz)
                 continue
             except (lzma.LZMAError, EOFError):
                 print(f"\n=== {info['product']} {new_rel} (re-packing — old xz was truncated) ===",
@@ -961,6 +976,7 @@ def cmd_update(products: list[str] | None = None, dry_run: bool = False,
                 if old != out_xz:
                     print(f"Removing obsolete {old.name}", file=sys.stderr)
                     old.unlink()
+            sync_package_db(pdir, out_xz)
         except Exception as e:
             print(f"FAILED for {pdir}: {e}", file=sys.stderr)
             RELEASES[pdir] = old_entry
@@ -1222,6 +1238,7 @@ Examples:
         with open(scratch, "rb") as src, lzma.open(out, "wb", preset=9) as dst:
             while chunk := src.read(1 << 20):
                 dst.write(chunk)
+        sync_package_db(args.product, out)
         src_mb = scratch.stat().st_size / 1024 / 1024
         dst_mb = out.stat().st_size / 1024 / 1024
         print(f"  {src_mb:.1f} MB -> {dst_mb:.1f} MB", file=sys.stderr)

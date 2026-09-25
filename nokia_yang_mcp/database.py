@@ -6,6 +6,7 @@ import lzma
 import os
 import sqlite3
 import sys
+import tempfile
 import time
 import uuid
 from collections.abc import Iterator
@@ -13,8 +14,8 @@ from contextlib import contextmanager
 from pathlib import Path
 
 RELEASES = {
-    "sros": {"release": "26.3.R2", "product": "SR OS"},
-    "srlinux": {"release": "26.3.1", "product": "SR Linux"},
+    "sros": {"release": "26.7.R1", "product": "SR OS"},
+    "srlinux": {"release": "26.7.1", "product": "SR Linux"},
 }
 
 PACKAGE_DIR = Path(__file__).resolve().parent
@@ -22,7 +23,7 @@ PROJECT_DIR = PACKAGE_DIR.parent
 PACKAGE_DATA_DIR = PACKAGE_DIR / "data"
 PROJECT_DATA_DIR = PROJECT_DIR / "data"
 DATA_DIR = PACKAGE_DATA_DIR if PACKAGE_DATA_DIR.exists() else PROJECT_DATA_DIR
-CACHE_DIR = Path(os.environ.get("YANG_CACHE_DIR", "/tmp/yang_browser_cache"))
+CACHE_DIR = Path(os.environ.get("YANG_CACHE_DIR", Path(tempfile.gettempdir()) / "yang_browser_cache"))
 
 
 def validate_product(product: str) -> str:

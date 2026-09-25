@@ -26,7 +26,7 @@ def test_get_stats_returns_bundled_release_metadata():
     stats = get_stats("sros")
 
     assert stats["product"] == "SR OS"
-    assert stats["release"] == "26.3.R2"
+    assert stats["release"] == "26.7.R1"
     assert int(stats["path_count"]) > 100000
 
 
@@ -56,11 +56,21 @@ def test_check_path_support_canonicalises_concrete_keys():
     assert "7250 IXR-e3x" in result.supported
 
 
+def test_known_path_with_unknown_platform_is_distinct_from_unknown_path():
+    result = check_path_support(
+        "sros",
+        "/configure/router[router-name=Base]/segment-routing/segment-routing-v6",
+        "no-such-platform",
+    )
+
+    assert result.status == "platform-unknown"
+
+
 def test_feature_support_matrix_returns_plain_structured_booleans():
     matrix = feature_support_matrix("sros", "srv6", "7250 IXR-e3x")
 
     assert matrix.product == "SR OS"
-    assert matrix.release == "26.3.R2"
+    assert matrix.release == "26.7.R1"
     assert matrix.platforms == ["7250 IXR-e3x"]
     assert matrix.rows
     assert isinstance(matrix.rows[0]["support"]["7250 IXR-e3x"], bool)
